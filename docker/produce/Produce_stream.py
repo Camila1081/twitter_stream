@@ -5,11 +5,7 @@ from datetime import date
 import boto3
 
 # To set your enviornment variables in your terminal run the following line:
-# export 'BEARER_TOKEN'='<your_bearer_token>'
 bearer_token = os.environ['BEARER_TOKEN']
-#bearer_token = 'AAAAAAAAAAAAAAAAAAAAADMlbgEAAAAA83ftMr%2FuwnmZQ924OyzKzYfdBD4%3DiVmjk38LwLC8ntk6DxD68kfZUvMBL4EP6QgTYy5iRhINORUZnI'
-#bearer_token = os.getenv('BEARER_TOKEN')
-#bearer_token = os.environ['BEARER_TOKEN']
 print(bearer_token)
 # Initialize the Kinesis client and set the stream name
 kinesis_client = boto3.client('kinesis', region_name='us-west-2')
