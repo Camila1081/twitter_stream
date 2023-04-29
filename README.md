@@ -1,4 +1,4 @@
-# AWS para Twitter Stream - Kinesis to DynamoDb
+# AWS para Twitter Stream - Kinesis >> DynamoDb
 
 ## Instalando terraform
 Incluir path da pasta do exe na variavel de ambiente

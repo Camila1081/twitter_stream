@@ -1,0 +1,28 @@
+# Use the Python 3.17 Alpine base image as the builder
+FROM python:alpine3.17 as builder
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the requirements.txt file into the working directory
+COPY produce/requirements.txt .
+
+# Update package index and install build dependencies, then install the Python packages from requirements.txt
+RUN apk update && \
+    apk add --no-cache build-base && \
+    pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Start a new build stage using the Python 3.17 Alpine base image
+FROM python:alpine3.17
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the installed packages from the builder stage
+COPY --from=builder /install /usr/local
+
+# Copy the produce directory content into the working directory
+COPY produce .
+
+# Set the default command for the container to run produce.py
+CMD ["python3", "Produce_stream.py"]
