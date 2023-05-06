@@ -1,6 +1,6 @@
 resource "aws_kinesis_stream" "this" {
   name = "${var.environment}_stream"
-  retention_period = 48
+  retention_period = 24
 
 #  encryption_type = "KMS"
 #  kms_key_id      = "alias/aws/kinesis"

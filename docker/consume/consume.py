@@ -3,6 +3,8 @@ import json
 import time
 from datetime import datetime
 
+
+
 # Initialize DynamoDB and Kinesis resources and set up constants
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 table_name = 'kinesis_twitter_table'
@@ -29,18 +31,32 @@ def process_record(record, kinesis):
         # Extract relevant fields from the tweet
         #tweet_id = tweet_data['id_str']
         tweet_id = tweet_data['id']
+        created_at= tweet_data['created_at']
+        print(f"Created at : {created_at}")
         #timestamp = datetime.strptime(tweet_data['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
         
         timestamp=record['ApproximateArrivalTimestamp']
         text = tweet_data['text']
         #user = tweet_data['user']
         print(f'\ntimestamp é {timestamp}')
+        #comprehend:
+        comprehend = boto3.client(service_name='comprehend', region_name='eu-west-1')
+        sentiment_all = comprehend.detect_sentiment(Text=text, LanguageCode='pt')
+        sentiment = sentiment_all['Sentiment']
+        print(f"Sentimento é :{sentiment}")
+        positive = sentiment_all['SentimentScore']['Positive']
+        negative = sentiment_all['SentimentScore']['Negative']
+        total = positive - negative
+        print(total)
+
         # Put data into DynamoDB
         table = dynamodb.Table(table_name)
         item = {
             'id': tweet_id,
             'timestamp': str(timestamp.isoformat()),
-            'text': text
+            'text': text,
+            'sentiment': str(round(total,2)),
+            'created_at': str(created_at),
             #,'user': {'id': user['id_str'],'screen_name': user['screen_name'],'name': user['name']}
         }
         table.put_item(Item=item)
@@ -56,15 +72,11 @@ def process_shard(shard_id):
         ShardId=shard_id,
         ShardIteratorType='TRIM_HORIZON'
     )['ShardIterator']
-    print('aqui0')
     while True:
         # Fetch records from the shard
-        print('aqui1')
         response = kinesis.get_records(ShardIterator=shard_iterator, Limit=25)
-        print('aqui2')
 
         if not response['Records']:
-            print('aqui3')
             break
 
         # Process each record in the response

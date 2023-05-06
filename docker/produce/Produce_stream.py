@@ -5,7 +5,11 @@ from datetime import date
 import boto3
 
 # To set your enviornment variables in your terminal run the following line:
+# export 'BEARER_TOKEN'='<your_bearer_token>'
 bearer_token = os.environ['BEARER_TOKEN']
+#bearer_token = 'AAAAAAAAAAAAAAAAAAAAADMlbgEAAAAA83ftMr%2FuwnmZQ924OyzKzYfdBD4%3DiVmjk38LwLC8ntk6DxD68kfZUvMBL4EP6QgTYy5iRhINORUZnI'
+#bearer_token = os.getenv('BEARER_TOKEN')
+#bearer_token = os.environ['BEARER_TOKEN']
 print(bearer_token)
 # Initialize the Kinesis client and set the stream name
 kinesis_client = boto3.client('kinesis', region_name='us-west-2')
@@ -59,8 +63,7 @@ def delete_all_rules(rules):
 def set_rules():
     # You can adjust the rules if needed
     sample_rules = [
-        {"value": "Itau"},
-        {"value": "Unibanco"},
+        {"value": "(Itau OR Unibanco) lang:pt -is:retweet"}
     ]
     payload = {"add": sample_rules}
     response = requests.post(
@@ -77,7 +80,9 @@ def set_rules():
 
 def get_stream():
     response = requests.get(
-        "https://api.twitter.com/2/tweets/search/stream", auth=bearer_oauth, stream=True,
+        #"https://api.twitter.com/2/tweets/search/stream", 
+        "https://api.twitter.com/2/tweets/search/stream?tweet.fields=created_at",
+        auth=bearer_oauth, stream=True,
     )
     print(response.status_code)
     tweet_count = 0
@@ -95,7 +100,7 @@ def get_stream():
 
             msg_tweet=json.dumps(json_response["data"], indent=4, sort_keys=True)
             id_tweet=json.dumps(json_response["data"]["id"], indent=4, sort_keys=True)
-
+            created_at=json.dumps(json_response["data"]["created_at"], indent=4, sort_keys=True)
             #msg_tweet=tweet["data"][0]["text"][0]
             #id_tweet=tweet["data"][0]["idt"][0]
             
@@ -113,9 +118,11 @@ def get_stream():
                 
                 print(f'tipo msg é : {type(msg_tweet)}')
                 print(f'\nmsg é : {msg_tweet}')
+                #print(f"Created at: {created_at[0,10,1]}")
                 # Put the record into the Kinesis stream
                 response = kinesis_client.put_record(StreamName=kinesis_stream_name, Data=msg_tweet,
                                                      PartitionKey=str(date.today()))
+                                                        #PartitionKey=created_at[0,10,1])
                 # Print the record being sent to Kinesis
                 print(f"Sending record to Kinesis: {msg_tweet}")
                 # Increment tweet counter
