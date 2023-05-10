@@ -1,5 +1,5 @@
 resource "aws_iam_role" "streaming" {
-  name               = "streaming"
+  name               = "streaming_role"
   assume_role_policy = data.aws_iam_policy_document.assume.json
 }
 data "aws_iam_policy_document" "assume" {
@@ -12,57 +12,21 @@ data "aws_iam_policy_document" "assume" {
     }
   }
 }
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-}
-
-resource "aws_subnet" "subnet_for_lambda" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-west-2b"
-
-  tags = {
-    Name = "vpc_lambda_es"
-  }
-}
-resource "aws_security_group" "sg_for_lambda" {
-  name_prefix = "sg_for_lambda"
-  vpc_id = aws_vpc.main.id
- 
-  ingress {
-    from_port = 0
-    to_port = 65535
-    protocol = "tcp"
-    cidr_blocks = ["10.0.1.0/24"]
-  }
- 
-  egress {
-    from_port = 0
-    to_port = 65535
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
 
 
 
 
-resource "aws_iam_role_policy_attachment" "vpc_access" {
-  policy_arn = data.aws_iam_policy.vpc_access.arn
-  role       = aws_iam_role.streaming.name
-}
-data "aws_iam_policy" "vpc_access" {
-  arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
 
 resource "aws_iam_policy" "access" {
-  name   = "streaming"
+  name   = "streaming_policy"
   policy = data.aws_iam_policy_document.access.json
 }
+
 resource "aws_iam_role_policy_attachment" "access" {
   policy_arn = aws_iam_policy.access.arn
   role       = aws_iam_role.streaming.name
 }
+
 data "aws_iam_policy_document" "access" {
   statement {
     actions = [
@@ -89,4 +53,23 @@ data "aws_iam_policy_document" "access" {
     resources = ["*"]
     effect    = "Allow"
   }
+  
+  statement {
+    actions = [
+      "iam:CreateServiceLinkedRole"
+    ]
+    resources = ["arn:aws:iam::*:role/aws-service-role/opensearchservice.amazonaws.com/*"]
+    effect    = "Allow"
+  }
+  statement {
+            effect = "Allow"
+            actions =  ["aoss:APIAccessAll"]
+            resources = ["arn:aws:aoss:us-west-2:176885971431:collection/collection-id"]
+  }
+  statement {
+            effect = "Allow"
+            actions = ["aoss:DashboardsAccessAll"]
+            resources = ["arn:aws:aoss:us-west-2:176885971431:dashboards/default"]
+  }
+    
 }

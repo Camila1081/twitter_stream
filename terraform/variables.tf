@@ -21,3 +21,4 @@ variable "tags" {
   description = "Default tags for this environment"
   default     = {}
 }
+

@@ -28,14 +28,11 @@ resource "aws_lambda_function" "streaming" {
 
   environment {
     variables = {
-      ENDPOINT = aws_elasticsearch_domain.main.endpoint
+      ENDPOINT = aws_opensearch_domain.main.endpoint
       INDEX    = each.value.name
     }
   }
-  vpc_config {
-    subnet_ids         = [aws_subnet.subnet_for_lambda.id]
-    security_group_ids = [aws_security_group.sg_for_lambda.id]
-  }
+
 }
 data "archive_file" "streaming" {
   for_each    = data.aws_dynamodb_table.table

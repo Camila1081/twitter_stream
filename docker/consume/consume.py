@@ -74,7 +74,7 @@ def process_shard(shard_id):
     )['ShardIterator']
     while True:
         # Fetch records from the shard
-        response = kinesis.get_records(ShardIterator=shard_iterator, Limit=25)
+        response = kinesis.get_records(ShardIterator=shard_iterator, Limit=100)
 
         if not response['Records']:
             break
