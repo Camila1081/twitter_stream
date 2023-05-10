@@ -37,9 +37,18 @@ data "aws_iam_policy_document" "access" {
   }
   statement {
     actions = [
+        "s3:*",
+        "s3-object-lambda:*"
+    ]
+    resources = ["*"]
+    effect = "Allow"
+  }
+  statement {
+    actions = [
       "dynamodb:GetShardIterator",
       "dynamodb:DescribeStream",
-      "dynamodb:GetRecords"
+      "dynamodb:GetRecords",
+      "dynamodb:ListStreams"
     ]
     resources = ["*"]
     effect    = "Allow"

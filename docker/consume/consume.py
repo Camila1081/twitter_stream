@@ -11,17 +11,17 @@ table_name = 'kinesis_twitter_table'
 stream_name = 'kinesis_twitter_stream'
 
 def process_record(record, kinesis):
-    print(f"\nrecord {record}")
+    print(f"\n\nrecord {record}")
     
     kinesis_data = json.loads(record['Data'])
-    print(f"\nkinesis_data {json.loads(record['Data'])}")
+    print(f"kinesis_data {json.loads(record['Data'])}")
     #print(f"\ntweet_data {json.loads(kinesis_data['Data'])}")
     try:
         # Load Kinesis data from the record and parse the tweet data
         kinesis_data = json.loads(record['Data'])
         #tweet_data = json.loads(kinesis_data['Data'])
         tweet_data = kinesis_data
-        print(f'\nTweet_data é {tweet_data}')
+        print(f'Tweet_data é {tweet_data}')
 
         # Check if the tweet has an 'id_str' field
         if 'id' not in tweet_data:
@@ -38,7 +38,7 @@ def process_record(record, kinesis):
         timestamp=record['ApproximateArrivalTimestamp']
         text = tweet_data['text']
         #user = tweet_data['user']
-        print(f'\ntimestamp é {timestamp}')
+        print(f'timestamp é {timestamp}')
         #comprehend:
         comprehend = boto3.client(service_name='comprehend', region_name='eu-west-1')
         sentiment_all = comprehend.detect_sentiment(Text=text, LanguageCode='pt')
