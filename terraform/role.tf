@@ -15,8 +15,6 @@ data "aws_iam_policy_document" "assume" {
 
 
 
-
-
 resource "aws_iam_policy" "access" {
   name   = "streaming_policy"
   policy = data.aws_iam_policy_document.access.json
@@ -43,7 +41,7 @@ data "aws_iam_policy_document" "access" {
       "dynamodb:DescribeStream",
       "dynamodb:GetRecords"
     ]
-    resources = values(data.aws_dynamodb_table.table)[*].stream_arn
+    resources = ["*"]
     effect    = "Allow"
   }
   statement {
@@ -52,8 +50,7 @@ data "aws_iam_policy_document" "access" {
     ]
     resources = ["*"]
     effect    = "Allow"
-  }
-  
+  }  
   statement {
     actions = [
       "iam:CreateServiceLinkedRole"
