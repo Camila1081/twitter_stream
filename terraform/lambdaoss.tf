@@ -23,7 +23,6 @@ resource "aws_lambda_function" "streaming" {
   layers           = [aws_lambda_layer_version.layer.arn]
   timeout          = 60
   handler         ="${aws_dynamodb_table.this.name}.handler"
-
   environment {
     variables = {
       ENDPOINT = aws_opensearch_domain.main.endpoint

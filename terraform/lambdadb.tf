@@ -2,7 +2,7 @@ resource "aws_lambda_event_source_mapping" "main" {
   event_source_arn  = aws_dynamodb_table.this.stream_arn
   function_name     = aws_lambda_function.to_s3.arn
   starting_position = "LATEST"
-  batch_size = 200
+  batch_size = 400
 }
 
 
