@@ -29,7 +29,7 @@ def file_content(s3,s3_client,bucket_name,itemname):
         print('vai entrar no read')
         existing_data= read_file(s3,bucket_name,itemname)
         print (f'content of file {itemname} is {existing_data}')
-        return existing_data,flag_glue
+        return existing_data.decode('utf-8'),flag_glue
     else:
         print(f'{itemname} é novo no bucket, chamar o glue')
         flag_glue=True
@@ -59,15 +59,8 @@ def lambda_handler(event, context):
     now = datetime.now()
     now = now.strftime("%d-%m-%Y:%H")
     s3_file=f'{now}.json'
-    
-
     print(f'file name {s3_file}')
 
-    #s3_client = boto3.client('s3')
-    
-    #is_empty = is_bucket_empty(bucket_name)
-    #print(f'flag empty {is_empty}')
-    
     flag=False
 
     print('records')
@@ -82,10 +75,10 @@ def lambda_handler(event, context):
        
     print(f'existing data {content}')   
     existing_data, flag_glue = file_content(s3,s3_client,bucket_name, s3_file)
-    print(f'existing data {existing_data}') 
-    #print(f'existing data decoded {existing_data.decode("utf-8")}') 
+    #print(f'existing data {existing_data}') 
+    
     #Concatenating strings
-    content = existing_data.decode('utf-8') + content
+    content = existing_data + content
     
     #Writing file in bucket
     print('Writing file in bucket')
