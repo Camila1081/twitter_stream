@@ -18,7 +18,7 @@ resource "aws_lambda_function" "to_s3" {
   # path.module in the filename.
   function_name = "lambda_function_tos3"
   role          = aws_iam_role.streaming.arn
-  filename = "${path.module}/functions/packagetos3.zip"
+  filename = "${path.module}/functions/lambdatos3.zip"
   lifecycle {
     ignore_changes = [filename]
   }
